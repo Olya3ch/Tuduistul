@@ -9,63 +9,121 @@
             href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
             rel="stylesheet"
         />
-        <meta
-            name="viewport"
-            content
-            href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
-            rel="stylesheet"
-        />
     </head>
     <body>
         <div
-            x-data="{newTaskName:'', 
-            tasks:[{ 
-            name:'First task',
-            completed:false,
-            archived:false
-        }]}"
+            x-data="{
+    newTaskName: '',
+    removeTask () {
+        this.tasks.pop()
+    },
+    addTask () {
+        console.log(this.newTaskName)
+        const newTask = {
+            name: this.newTaskName,
+            completed: false,
+            archived: false
+        }
+        this.tasks.push(newTask);
+        this.newTaskName = '';
+    },
+    completeTask (task) {
+        task.completed = true;
+    },
+     archiveTask (task) {
+        task.archived = true;
+    },
+    getUncompletedTasks () {
+        return this.tasks.filter(task => !task.completed)
+    },
+      getCompletedTasks () {
+        return this.tasks.filter(task => task.completed && !task.archived)
+    },
+    tasks: [
+        {
+            name: 'un tasc randomnâi',
+            completed: false,
+            archived: false,
+        },
+    ],
+}"
             class="container mx-auto px-6"
         >
             <h1 class="text-4xl font-extralight my-8">Tuduistul</h1>
             <div class="flex flex-nowrap flex-row">
                 <input
+                    x-model="newTaskName"
                     placeholder="Vreau să..."
                     type="text"
                     name="add-task"
                     id="add-task"
-                    class="bg-gray-100 rounded-lg p-2 flex-grow mr-2"
+                    @keydown.enter="addTask()"
+                    class="bg-gray-100 rounded-lg p-2 mr-2 flex-grow"
                 />
                 <button
-                    class="bg-green-500 text-white p-2 rounded-lg font-bold"
+                    class="bg-green-500 text-white px-4 font-bold rounded-lg"
+                    @click="addTask()"
                 >
                     Adaugă
                 </button>
             </div>
-            
             <ul
-                class="mt-8 divide-y divide-grey-100 border-b border-t border-grey-100"
+                class="mt-8 divide-y divide-gray-100 border-t border-b border-gray-100"
             >
-                <template x-for="task in tasks">
+                <template x-for="task in getUncompletedTasks()">
                     <li
                         class="py-2 flex flex-nowrap flex-row items-center gap-x-2"
                     >
                         <div
                             class="task-name flex-grow"
-                            x-text="tasks[0].name"
+                            x-text="task.name"
                         ></div>
                         <button
-                            class="bg-green-100 text-green-500 p-2 rounded-lg font-bold"
-                            >
+                            class="bg-green-100 text-green-500 px-4 py-2 rounded-lg font-bold"
+                            @click="completeTask(task)"
+                        >
                             Complete
                         </button>
+
                         <button
-                            class="bg-red-100 text-red-500 p-2 rounded-lg font-bold"
+                            class="bg-red-100 text-red-500 px-4 py-2 rounded-lg font-bold"
                         >
                             Delete
                         </button>
                     </li>
                 </template>
             </ul>
+            <template x-if=" getCompletedTasks().length > 0">
+                <div>
+                    <h1 class="text-md font-bold pt-8">Completed</h1>
+                    <ul
+                        class="mt-2 divide-y divide-gray-100 border-t border-b border-gray-100"
+                    >
+                        <template x-for="task in getCompletedTasks()">
+                            <li
+                                class="py-2 flex flex-nowrap flex-row items-center gap-x-2"
+                            >
+                                <div
+                                    class="task-name flex-grow"
+                                    x-text="task.name"
+                                ></div>
+                                <button
+                                    class="bg-gray-100 text-gray-500 px-4 py-2 rounded-lg font-bold"
+                                    @click="archiveTask(task)"
+                                >
+                                    Archive
+                                </button>
+
+                                <button
+                                    class="bg-red-100 text-red-500 px-4 py-2 rounded-lg font-bold"
+                                >
+                                    Delete
+                                </button>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </template>
         </div>
         <script type="module">
             import 'alpinejs';
